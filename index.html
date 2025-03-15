@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kütüphane Teknolojileri Rehberi</title>
+  
+  <!-- Bootstrap 5, FontAwesome & Google Fonts -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+  <style>
+    /* Yanıp sönen uyarı metni */
+    #alertBanner {
+      background-color: #ffcc00;
+      color: #000;
+      font-weight: bold;
+      padding: 5px 10px;
+      text-align: center;
+      animation: blinker 1s linear infinite;
+      font-size: 14px;
+    }
+    @keyframes blinker {
+      50% { opacity: 0; }
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      color: #333;
+      text-align: center;
+      padding-top: 120px;
+      padding-bottom: 80px;
+    }
+    /* Navbar */
+    .navbar {
+      background-color: rgba(255, 255, 255, 0.9);
+    }
+    .navbar-brand, .nav-link, .lang-toggle {
+      color: #007bff !important;
+      font-weight: bold;
+    }
+    /* AI Asistan */
+    #aiAssistant {
+      position: fixed;
+      top: 60px;
+      right: 20px;
+      background: #fff;
+      color: #333;
+      padding: 10px 15px;
+      border-radius: 10px;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      z-index: 1050;
+    }
+    #aiAssistant i {
+      font-size: 40px;
+      margin-right: 10px;
+    }
+    /* Kullanıcı Seçimi */
+    .user-selection {
+      margin: 30px 0;
+    }
+    /* Kart Tasarımı - Gelişmiş Hover Efekti */
+    .card {
+      background: #fff;
+      color: #333;
+      margin-bottom: 20px;
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      border: none;
+      box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+    }
+    .card:hover {
+      transform: scale(1.03);
+      box-shadow: 0px 4px 16px rgba(0,0,0,0.2);
+    }
+    /* İletişim Formu */
+    .contact-section {
+      background: #fff;
+      color: #333;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+      margin: 40px auto;
+      max-width: 600px;
+    }
+    /* Footer */
+    footer {
+      background: rgba(0, 0, 0, 0.85);
+      padding: 15px;
+      color: #fff;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      font-size: 14px;
+    }
+    footer a {
+      color: #fff;
+      text-decoration: underline;
+    }
+    footer .social-icons i {
+      margin: 0 8px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    @media (max-width: 576px) {
+      #aiAssistant { top: 60px; right: 5px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Yanıp Sönen Uyarı Mesajı -->
+  <div id="alertBanner">
+    Bu proje Kırıkkale Üniversitesi Bilgi ve Belge Yönetimi, Bilgi Profesyonelleri Topluluğu ÜNİDES projesi kapsamında yapılmıştır.
+  </div>
+
+  <!-- Navbar + Language Toggle -->
+  <nav class="navbar fixed-top navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="#">Kütüphane Rehberi</a>
+      <div class="ms-auto">
+        <button class="btn btn-outline-primary lang-toggle" id="langToggle">EN</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- AI Asistan -->
+  <div id="aiAssistant">
+    <i class="fa fa-robot"></i>
+    <p id="aiMessage">🤖 Hoş Geldin Araştırmacı! Nasıl yardımcı olabilirim?</p>
+  </div>
+
+  <!-- Kullanıcı Seçimi -->
+  <div class="container user-selection">
+    <h2 id="userSelectTitle">👤 Kullanıcı Türünüzü Seçin</h2>
+    <select id="userRole" class="form-select w-50 mx-auto" onchange="changeContent()">
+      <option value="lisans">Lisans Öğrencisi</option>
+      <option value="yuksek_lisans">Yüksek Lisans</option>
+      <option value="doktora">Doktora</option>
+      <option value="akademik">Akademik Personel</option>
+      <option value="idari">İdari Personel</option>
+    </select>
+  </div>
+
+  <!-- Kütüphane Teknolojileri Kartları -->
+  <div id="techContainer" class="container">
+    <div class="row" id="techCards">
+      <!-- Kartlar JS tarafından eklenecek -->
+    </div>
+  </div>
+
+  <!-- Detay Modal -->
+  <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content text-start">
+        <div class="modal-header">
+          <h5 class="modal-title" id="detailModalLabel"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body" id="detailModalBody"></div>
+        <div class="modal-footer">
+          <a href="#" id="detailModalLink" class="btn btn-primary" target="_blank">Kaynaklara Git</a>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- İletişim Formu -->
+  <div class="container contact-section">
+    <h2 id="contactTitle">📩 Bize Ulaşın</h2>
+    <form id="contactForm">
+      <div class="mb-3">
+        <input type="text" class="form-control" placeholder="Adınız" required />
+      </div>
+      <div class="mb-3">
+        <input type="email" class="form-control" placeholder="E-posta Adresiniz" required />
+      </div>
+      <div class="mb-3">
+        <textarea class="form-control" rows="4" placeholder="Mesajınız" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-success" id="sendBtn">Gönder</button>
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <footer class="d-flex justify-content-between align-items-center">
+    <div>
+      AI'Han Academy | <a href="mailto:ayhanbzkrt@gmail.com">ayhanbzkrt@gmail.com</a> | 
+      <a href="https://www.linkedin.com/in/ayhanbozkurt/" target="_blank">LinkedIn</a>
+    </div>
+    <div class="social-icons">
+      <i class="fab fa-facebook-square" onclick="window.open('https://www.facebook.com','_blank')"></i>
+      <i class="fab fa-twitter-square" onclick="window.open('https://www.twitter.com','_blank')"></i>
+      <i class="fab fa-instagram-square" onclick="window.open('https://www.instagram.com','_blank')"></i>
+      <i class="fab fa-youtube-square" onclick="window.open('https://www.youtube.com','_blank')"></i>
+      <button id="shareGameBtn" class="btn btn-sm btn-outline-light ms-2">
+        <i class="fa fa-share-alt"></i> Paylaş
+      </button>
+    </div>
+  </footer>
+
+  <!-- Bootstrap Bundle JS (Popper included) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Dil ve içerik verileri
+    let currentLanguage = "tr";
+    const contentData = {
+      "lisans": [
+        { 
+          title: { tr: "📚 Dijital Kütüphaneler", en: "Digital Libraries" },
+          description: { tr: "E-kitaplar ve online dergiler.", en: "E-books and online journals." },
+          details: { 
+            tr: "Dijital kütüphaneler, fiziksel kütüphanelerin dijital versiyonlarıdır. Bu sistemler; e-kitaplar, dijital dergiler, çevrimiçi veri tabanları ve interaktif öğrenme araçları sunarak, kullanıcılara bilgiye hızlı ve erişilebilir bir şekilde ulaşma imkanı tanır.",
+            en: "Digital libraries are the digital versions of physical libraries. These systems provide e-books, digital journals, online databases and interactive learning tools, giving users fast and easy access to information."
+          },
+          link: "https://ornek-kaynak1.com"
+        },
+        { 
+          title: { tr: "🧠 Yapay Zeka", en: "Artificial Intelligence" },
+          description: { tr: "Akıllı kataloglama ve öneri sistemleri.", en: "Smart cataloging and recommendation systems." },
+          details: { 
+            tr: "Yapay zeka, kütüphanelerde verilerin analiz edilmesi, otomatik kataloglama, kullanıcı alışkanlıklarına göre öneri sistemleri geliştirilmesi gibi hizmetlerde kullanılır. Bu sayede bilgiye erişim süreci daha kişiselleştirilir.",
+            en: "Artificial intelligence is used in libraries for data analysis, automatic cataloging, and developing recommendation systems based on user habits, thus personalizing the information access process."
+          },
+          link: "https://ornek-kaynak2.com"
+        }
+      ],
+      "yuksek_lisans": [
+        { 
+          title: { tr: "🔗 Blockchain", en: "Blockchain" },
+          description: { tr: "Telif hakları yönetimi.", en: "Copyright management." },
+          details: { 
+            tr: "Blockchain teknolojisi, dijital içeriklerin doğruluğunu ve telif haklarının korunmasını sağlamak amacıyla kullanılır. Bu sayede içerik sahipliği ve lisanslama süreçleri şeffaf hale gelir.",
+            en: "Blockchain technology is used to secure digital content integrity and protect copyrights, making ownership and licensing processes transparent."
+          },
+          link: "https://ornek-kaynak3.com"
+        },
+        { 
+          title: { tr: "🕶 VR/AR", en: "VR/AR" },
+          description: { tr: "Etkileşimli öğrenme deneyimleri.", en: "Interactive learning experiences." },
+          details: { 
+            tr: "Sanal ve artırılmış gerçeklik teknolojileri, öğrencilere interaktif kütüphane turları ve simülasyonlar sunarak öğrenme deneyimlerini zenginleştirir.",
+            en: "Virtual and augmented reality technologies enrich learning experiences by offering interactive library tours and simulations."
+          },
+          link: "https://ornek-kaynak4.com"
+        }
+      ],
+      "doktora": [
+        { 
+          title: { tr: "💾 AI ve Big Data", en: "AI and Big Data" },
+          description: { tr: "Veri analizi ve makine öğrenimi.", en: "Data analysis and machine learning." },
+          details: { 
+            tr: "Büyük veri analizi ve yapay zeka teknikleri, kütüphane verilerinin derinlemesine incelenmesi ve tahmine dayalı modellerin oluşturulması için kullanılır.",
+            en: "Big data analytics and AI techniques are used for in-depth analysis of library data and building predictive models."
+          },
+          link: "https://ornek-kaynak5.com"
+        },
+        { 
+          title: { tr: "🔐 Siber Güvenlik", en: "Cybersecurity" },
+          description: { tr: "Erişim yetkilendirme ve veri şifreleme.", en: "Access control and data encryption." },
+          details: { 
+            tr: "Kütüphane sistemlerinin güvenliği için siber güvenlik önlemleri; veri şifreleme, erişim kontrolü ve sistem izleme yöntemleri ile sağlanır.",
+            en: "Cybersecurity measures—such as data encryption, access control, and system monitoring—ensure the security of library systems."
+          },
+          link: "https://ornek-kaynak6.com"
+        }
+      ],
+      "akademik": [
+        { 
+          title: { tr: "🌱 Yeşil Kütüphaneler", en: "Green Libraries" },
+          description: { tr: "Çevre dostu kütüphaneler.", en: "Eco-friendly libraries." },
+          details: { 
+            tr: "Yeşil kütüphaneler, enerji verimliliği ve sürdürülebilirlik odaklı projelerle, çevreye duyarlı hizmetler sunar. Modern teknolojiler kullanılarak, enerji tasarrufu sağlanır.",
+            en: "Green libraries offer eco-friendly services with projects focusing on energy efficiency and sustainability, using modern technologies to save energy."
+          },
+          link: "https://ornek-kaynak7.com"
+        }
+      ],
+      "idari": [
+        { 
+          title: { tr: "📖 Açık Bilim", en: "Open Science" },
+          description: { tr: "Araştırma verileri yönetimi.", en: "Research data management." },
+          details: { 
+            tr: "Açık bilim, araştırma verilerinin paylaşımını, analizini ve işbirliğini kolaylaştırarak, akademik çalışmalara şeffaflık getirir.",
+            en: "Open science facilitates the sharing, analysis, and collaboration of research data, bringing transparency to academic work."
+          },
+          link: "https://ornek-kaynak8.com"
+        }
+      ]
+    };
+
+    // Render kartları oluştur
+    function changeContent() {
+      const userRole = document.getElementById("userRole").value;
+      const techCards = document.getElementById("techCards");
+      techCards.innerHTML = "";
+
+      // Her role için ilgili kartları oluştur
+      contentData[userRole].forEach((item, index) => {
+        techCards.innerHTML += `
+          <div class="col-md-4">
+            <div class="card p-3">
+              <h3>${item.title[currentLanguage]}</h3>
+              <p>${item.description[currentLanguage]}</p>
+              <button class="btn btn-primary" onclick="openDetailModal('${userRole}', ${index})">
+                ${ currentLanguage === "tr" ? "Daha Fazla" : "More Info" }
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      
+      // Güncel AI mesajı
+      document.getElementById("aiMessage").innerText = 
+        currentLanguage === "tr" 
+          ? `🤖 Merhaba ${userRole.toUpperCase()}! İşte senin için önerilerim!` 
+          : `🤖 Hello ${userRole.toUpperCase()}! Here are my suggestions for you!`;
+
+      // Kullanıcı seçimi başlığı
+      document.getElementById("userSelectTitle").innerText = 
+        currentLanguage === "tr" ? "👤 Kullanıcı Türünüzü Seçin" : "👤 Select Your User Type";
+      
+      // İletişim formu başlığı
+      document.getElementById("contactTitle").innerText = 
+        currentLanguage === "tr" ? "📩 Bize Ulaşın" : "📩 Contact Us";
+    }
+
+    // Detay modalını aç (Bootstrap Modal API'si kullanılarak)
+    function openDetailModal(role, index) {
+      const item = contentData[role][index];
+      document.getElementById("detailModalLabel").innerText = item.title[currentLanguage];
+      document.getElementById("detailModalBody").innerHTML = `<p>${item.details[currentLanguage]}</p>`;
+      document.getElementById("detailModalLink").href = item.link;
+      
+      // Modal'ı göster (Bootstrap)
+      const detailModal = new bootstrap.Modal(document.getElementById("detailModal"));
+      detailModal.show();
+    }
+
+    // Dil değiştirme butonu
+    document.getElementById("langToggle").addEventListener("click", function() {
+      currentLanguage = currentLanguage === "tr" ? "en" : "tr";
+      this.innerText = currentLanguage === "tr" ? "EN" : "TR";
+      changeContent();
+      // AI asistan ve diğer metinler için de dil güncellemesi
+      document.getElementById("aiMessage").innerText = 
+        currentLanguage === "tr" 
+          ? "🤖 Hoş Geldin Araştırmacı! Nasıl yardımcı olabilirim?" 
+          : "🤖 Welcome Researcher! How can I help you?";
+    });
+
+    // Paylaşım Butonu
+    document.getElementById("shareGameBtn").addEventListener("click", function() {
+      alert(currentLanguage === "tr" 
+        ? "Bu harika rehberi arkadaşlarınla paylaş!" 
+        : "Share this amazing guide with your friends!");
+    });
+
+    // İletişim formu gönderim örneği (Basit demo, form gönderimi burada işleniyor)
+    document.getElementById("contactForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      alert(currentLanguage === "tr" ? "Mesajınız gönderildi, teşekkürler!" : "Your message has been sent, thank you!");
+      this.reset();
+    });
+
+    // Sayfa yüklendiğinde içeriği oluştur
+    document.addEventListener("DOMContentLoaded", changeContent);
+  </script>
+</body>
+</html>
